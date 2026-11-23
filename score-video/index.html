@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="譜影對照">
+<meta name="theme-color" content="#1d1b19">
+<title>樂譜 × 演奏影片對照</title>
+<script src="pdf.min.js"></script>
+<style>
+  :root{--ink:#24211d;--muted:#7a736a;--paper:#f5f1e8;--line:#ddd5c7;--acc:#b5452c;--acc2:#2f6f6a;--dark:#1d1b19}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--paper);color:var(--ink);-webkit-tap-highlight-color:transparent}
+  button,select,input,textarea{font:inherit;color:inherit}
+  button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+  button:active{transform:translateY(1px)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+  button.danger{color:var(--acc);border-color:#e8c4bb}
+  header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line)}
+  header h1{font-size:16px;margin:0 auto 0 0;letter-spacing:.02em}
+  .proj{display:flex;gap:6px;align-items:center}
+  .proj .plabel{font-size:13px;color:var(--muted)}
+  .proj select{max-width:min(46vw,360px);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;font-weight:600}
+  body.standalone .proj{display:none}
+  @media(max-width:600px){header h1{display:none}.proj{margin-right:auto}}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .seg button{border:0;border-radius:0;padding:6px 12px}
+  .seg button.on{background:var(--ink);color:#fff}
+  #app{display:block}
+  #player{position:sticky;top:0;z-index:20;background:var(--dark);color:#eee;padding:8px 10px 10px}
+  #player button,#player select{background:#2d2a27;border-color:#45403a;color:#eee}
+  #player button:disabled{opacity:1;cursor:default}
+  #player button.on{background:var(--acc2);border-color:var(--acc2)}
+  video{width:100%;max-height:32vh;background:#000;display:block;border-radius:6px}
+  .novideo{height:120px;display:flex;align-items:center;justify-content:center;color:#aaa;border:1px dashed #555;border-radius:6px;font-size:14px;text-align:center;padding:10px}
+  .abar{display:none;gap:8px;align-items:center;padding:6px 0}
+  .abar #pp{min-width:44px;font-size:16px}
+  .abar #seek{flex:1;accent-color:#e9c9a8}
+  .abar #atime{font-variant-numeric:tabular-nums;font-size:13px;color:#cfc7bb}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;scrollbar-width:none}
+  .tabs button{flex:0 0 auto}
+  .tabs button.cur{background:#f0e6d6;color:var(--ink);border-color:#f0e6d6;font-weight:600}
+  .ctrls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+  .ctrls .time{font-variant-numeric:tabular-nums;margin-left:auto;color:#cfc7bb}
+  #info{margin-top:8px;font-size:14px;color:#ddd;min-height:20px;line-height:1.45}
+  #info b{color:#fff}
+  #info .note{color:#e9c9a8}
+  main{padding:12px}
+  details#setup{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+  details#setup summary{cursor:pointer;font-weight:600}
+  .block{margin-top:12px}
+  .block h4{margin:0 0 6px;font-size:14px}
+  .hint{color:var(--muted);font-size:13px;line-height:1.5}
+  .vrow{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}
+  .vrow input{flex:1 1 140px;padding:5px 8px;border:1px solid var(--line);border-radius:7px}
+  .vrow .st{font-size:12px;color:var(--muted)}
+  .vrow .st.bad{color:var(--acc)}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+  .thumb{position:relative;width:70px}
+  .thumb img{width:70px;border:1px solid var(--line);border-radius:4px;display:block}
+  .thumb span{font-size:11px;color:var(--muted)}
+  .thumb button{position:absolute;top:-6px;right:-6px;padding:0 6px;border-radius:10px;font-size:12px}
+  label.file{display:inline-block}
+  label.file input{display:none}
+  label.file span{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer}
+  #banner{display:none;background:#fbe9e3;border:1px solid #efc6b8;color:#7a2d1b;border-radius:10px;padding:8px 12px;font-size:14px;margin-bottom:10px}
+  body.mark #banner{display:block}
+  .scorebar{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px;flex-wrap:wrap}
+  #score{overflow-x:auto}
+  body.fit #score{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;overflow:visible}
+  body.fit .page{margin:0;scroll-margin-top:calc(var(--bar,0px) + 6px)}
+  body.fit{scroll-snap-type:y proximity}
+  body.fit .page{scroll-snap-align:start}
+  #fitBtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  /* audio-only: thin toolbar on top, score takes the whole screen */
+  body.audio #app{display:block}
+  body.audio #player{height:auto;overflow:visible;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  body.audio #vidWrap{flex:1 1 300px;min-width:0}
+  body.audio .abar{padding:0}
+  body.audio .tabs{flex:0 1 auto;max-width:100%;padding:0}
+  body.audio .tabs button{max-width:220px;overflow:hidden;text-overflow:ellipsis}
+  body.audio .ctrls{flex:0 0 auto}
+  body.audio .ctrls .time{display:none}
+  body.audio #info{flex-basis:100%;margin:0;font-size:13px;min-height:0}
+  body.audio #info:empty{display:none}
+  body.audio main{padding:10px}
+  body.audio header{padding:6px 12px}
+  .page{position:relative;margin:0 auto 14px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);user-select:none;-webkit-user-select:none}
+  .page img{width:100%;display:block;pointer-events:none}
+  .page .pno{position:absolute;right:6px;bottom:4px;font-size:11px;color:#aaa}
+  body.moving .page{cursor:copy;outline:2px dashed var(--acc2);outline-offset:2px}
+  body.mark .page{cursor:crosshair;outline:2px dashed #e7b4a6;outline-offset:2px}
+  .mk{position:absolute;transform:translate(-50%,-50%);min-width:26px;height:26px;padding:0 6px;border-radius:13px;border:2px solid var(--acc);background:rgba(255,255,255,.85);color:var(--acc);font-size:12px;font-weight:700;line-height:22px;text-align:center}
+  .mk::before{content:"";position:absolute;inset:-10px}
+  .mchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:14px;padding:2px 4px 2px 10px;margin:3px;font-size:13px;background:#fff}
+  .mchip button{border:0;padding:0 6px;color:var(--acc)}
+  .mk.has{background:var(--acc);color:#fff}
+  .mk.now{box-shadow:0 0 0 4px rgba(47,111,106,.55);border-color:var(--acc2);background:var(--acc2);color:#fff}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:24px;line-height:1.8;font-size:15px}
+  .empty ol{margin:6px 0 0;padding-left:22px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+  .modal.hidden{display:none}
+  .box{background:#fff;width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:16px;max-height:85vh;overflow:auto}
+  @media(min-width:600px){.modal{align-items:center}.box{border-radius:16px}}
+  .box h3{margin:0 0 10px;font-size:17px}
+  .box label{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .box input,.box textarea{display:block;width:100%;margin-top:4px;padding:8px;border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px}
+  .box .row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .sp{flex:1}
+  .times{border-top:1px solid var(--line);padding-top:8px}
+  .sub{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .trow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px dotted var(--line);font-size:14px}
+  .trow .vn{min-width:80px;font-weight:600}
+  .trow .tv{font-variant-numeric:tabular-nums;min-width:56px}
+  .trow.curv .vn::after{content:" ●";color:var(--acc2)}
+  .trow button{padding:3px 8px;font-size:13px}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:20px;font-size:14px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+  #toast.show{opacity:1}
+  textarea.io{width:100%;height:120px;font-family:ui-monospace,Menlo,monospace;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:8px}
+  @media(min-width:900px){
+    #app{display:grid;grid-template-columns:minmax(360px,38%) 1fr;align-items:start}
+    #player{height:100vh;overflow:auto}
+    video{max-height:52vh}
+    main{padding:14px 18px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>樂譜 × 演奏影片對照</h1>
+  <div class="proj" id="projBar"><span class="plabel">曲目</span><select id="projSel" aria-label="選擇曲目"></select><button id="projMenu" aria-label="曲目選項">⋯</button></div>
+  <div class="seg" id="modeSeg">
+    <button data-m="play" class="on">播放</button>
+    <button data-m="mark">標記</button>
+  </div>
+</header>
+
+<div id="app">
+  <section id="player">
+    <div id="vidWrap">
+      <video id="video" controls playsinline preload="metadata"></video>
+      <div class="novideo" id="novideo">先在「設定」新增演奏版本（影片或音檔）</div>
+      <div class="abar" id="abar"><button id="pp" aria-label="播放或暫停">▶</button><input type="range" id="seek" min="0" max="1000" value="0" aria-label="播放位置"><span id="atime">0:00.0</span></div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="ctrls">
+      <button id="back">−2 秒</button>
+      <button id="fwd">+2 秒</button>
+      <select id="rate" title="速度">
+        <option value="0.5">0.5×</option><option value="0.6">0.6×</option><option value="0.75">0.75×</option>
+        <option value="0.85">0.85×</option><option value="1" selected>1×</option><option value="1.1">1.1×</option>
+      </select>
+      <button id="loopBtn" title="在目前標記點與下一個標記點之間循環">段落循環</button>
+      <button id="followBtn" class="on" title="播放時自動捲動到目前段落">跟隨譜面</button>
+      <button id="audioBtn" title="隱藏影片畫面，只播放聲音">只聽聲音</button>
+      <span class="time" id="time">0:00.0</span>
+    </div>
+    <div id="info"></div>
+  </section>
+
+  <main>
+    <details id="setup">
+      <summary>設定：樂譜、演奏版本、備份</summary>
+      <div class="block">
+        <h4>1. 樂譜</h4>
+        <label class="file"><input type="file" id="scoreIn" accept="image/*,application/pdf,.pdf" multiple><span>＋ 加入樂譜（圖片或 PDF）</span></label>
+        <div class="hint">可以一次選好幾張圖片，會按照檔名順序排列；PDF 會自動拆成每一頁。</div>
+        <div class="thumbs block" id="thumbs"></div>
+      </div>
+      <div class="block">
+        <h4>2. 演奏版本</h4>
+        <label class="file"><input type="file" id="videoIn" accept="video/*" multiple><span>＋ 新增影片版本</span></label>
+        <label class="file"><input type="file" id="audioIn" accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.aif,.aiff" multiple><span>＋ 新增音檔版本</span></label>
+        <div class="hint">每個檔案是一個版本，可以把名稱改成演奏家的名字。影片會試著存在這個瀏覽器裡，下次打開就不用重新選。</div>
+        <div id="vlist" class="block"></div>
+      </div>
+      <div class="block">
+        <h4>標記點管理</h4>
+        <div id="mlist"></div>
+      </div>
+      <div class="block">
+        <h4>3. 備份與匯入標記</h4>
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="exportBtn">產生備份文字</button>
+          <button id="importBtn">貼上備份來匯入</button>
+          <button id="resetBtn" class="danger">清空這首曲目</button>
+        </div>
+        <div class="hint">資料只存在這台裝置的這個瀏覽器。備份文字裡有標記點和筆記（不含樂譜和影片），換裝置時先放好同一份樂譜，再貼上匯入即可。</div>
+        <div id="ioArea"></div>
+      </div>
+      <div class="block">
+        <h4>4. 匯出完整檔案（含影片、樂譜、標記）</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="packBtn" class="pri">下載完整檔案</button>
+          <label class="file"><input type="file" id="openPack" accept=".html,text/html"><span>開啟匯出的檔案</span></label>
+        </div>
+        <div class="hint">會產生一個 .html 檔。在電腦上直接雙擊就能離線使用；在 iPad 或手機上，請打開這個工具的頁面，再按「開啟匯出的檔案」把它載入。影片越大，檔案就越大（約為原影片的 1.35 倍）。</div>
+        <div class="hint" id="packStatus"></div>
+      </div>
+    </details>
+
+    <div id="banner">標記模式：先讓影片停在樂句開頭，再點樂譜上的位置，就會用「目前的影片時間」新增標記點。點既有的標記點，可以幫目前的版本補上時間，或修改名稱和筆記。</div>
+    <div class="scorebar">
+      <button id="fitBtn" title="每頁縮放到剛好一個螢幕高，橫放時會兩頁並排">整頁顯示</button>
+      <span class="zoomctl">樂譜大小 <input type="range" id="zoom" min="40" max="200" step="5" value="100"> <span id="zoomVal">100%</span></span>
+    </div>
+    <div id="score"></div>
+  </main>
+</div>
+
+<div class="modal hidden" id="modal"><div class="box" id="box"></div></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+/* capture a clean copy of this page before anything changes it (used for export) */
+const EMB = document.getElementById('embedded');
+const EMB_META = EMB ? EMB.textContent : null;
+const EMB_MEDIA = {};
+document.querySelectorAll('script[type="application/octet-base64"]').forEach(el => { EMB_MEDIA[el.id.slice(2)] = { mime: el.dataset.mime, b64: el.textContent }; el.remove(); });
+if (EMB) EMB.remove();
+let TEMPLATE = null;
+try { TEMPLATE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML; } catch(e){}
+const STANDALONE = !!EMB_META;
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = t => { if (t == null || isNaN(t)) return '—'; const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(1); };
+
+const video = $('#video');
+let S = { pages: [], versions: [], markers: [], cur: null, mode: 'play', zoom: 100, follow: true, loop: false, rate: 1, audioOnly: false };
+const pageUrls = {}, videoUrls = {}, pageBlobs = {}, videoBlobs = {};
+let seg = null, activeId = null, internalSeek = false, pending = null;
+
+/* ---------- storage (IndexedDB, best effort) ---------- */
+let db = null;
+function openDB(){ return new Promise(res => { try { const r = indexedDB.open('score-video-sync', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => { db = r.result; res(); }; r.onerror = () => res(); } catch(e){ res(); } }); }
+function idbGet(k){ return new Promise(res => { if (!db) return res(null); try { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch(e){ res(null); } }); }
+function idbSet(k, v){ return new Promise(res => { if (!db) return res(false); try { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => res(false); t.onabort = () => res(false); } catch(e){ res(false); } }); }
+function idbDel(k){ return new Promise(res => { if (!db) return res(); try { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(); t.onerror = () => res(); } catch(e){ res(); } }); }
+let saveTimer = null;
+let P = { list: [], current: null };
+const metaKey = () => P.current ? 'meta:' + P.current : 'meta';
+function metaNow(){ return { pageIds: S.pages.map(p => p.id), versions: S.versions, markers: S.markers, cur: S.cur, zoom: S.zoom, follow: S.follow, rate: S.rate, audioOnly: S.audioOnly, fit: S.fit }; }
+async function flushSave(){ clearTimeout(saveTimer); if (!STANDALONE && P.list.some(p => p.id === P.current)) await idbSet(metaKey(), metaNow()); }
+function save(){ try { renderMList(); } catch(e){} clearTimeout(saveTimer); saveTimer = setTimeout(() => {
+  if (!STANDALONE && P.list.length && !P.list.some(p => p.id === P.current)) return;
+  idbSet(metaKey(), { pageIds: S.pages.map(p => p.id), versions: S.versions, markers: S.markers, cur: S.cur, zoom: S.zoom, follow: S.follow, rate: S.rate, audioOnly: S.audioOnly, fit: S.fit });
+}, 300); }
+
+/* ---------- ui helpers ---------- */
+let toastTimer;
+function toast(msg, ms = 2200){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms); }
+const modal = $('#modal'), box = $('#box');
+function closeModal(){ modal.classList.add('hidden'); box.onclick = null; }
+modal.addEventListener('click', e => { if (e.target === modal) { if (modal._onClose) modal._onClose(); closeModal(); } });
+function ask(msg, okText = '確定'){ return new Promise(res => {
+  modal._onClose = () => res(false);
+  box.innerHTML = `<h3>${esc(msg)}</h3><div class="row"><span class="sp"></span><button data-a="no">取消</button><button data-a="yes" class="danger">${esc(okText)}</button></div>`;
+  modal.classList.remove('hidden');
+  box.onclick = e => { const a = e.target.dataset.a; if (!a) return; closeModal(); res(a === 'yes'); };
+}); }
+
+const getM = id => S.markers.find(m => m.id === id);
+const curV = () => S.versions.find(v => v.id === S.cur);
+function timedMarkers(vid = S.cur){ return S.markers.filter(m => m.times[vid] != null).sort((a, b) => a.times[vid] - b.times[vid]); }
+function activeAt(t){ let best = null; for (const m of timedMarkers()) { if (m.times[S.cur] <= t + 0.05) best = m; else break; } return best; }
+function segFromTime(t){
+  const list = timedMarkers(); let start = 0, end = video.duration || 1e9, id = null;
+  for (let i = 0; i < list.length; i++) { const tt = list[i].times[S.cur]; if (tt <= t + 0.05) { start = tt; id = list[i].id; end = list[i + 1] ? list[i + 1].times[S.cur] : (video.duration || 1e9); } }
+  if (id === null && list.length) end = list[0].times[S.cur];
+  return { start, end, id };
+}
+function seekTo(t){ internalSeek = true; video.currentTime = Math.max(0, t); }
+
+/* ---------- mode ---------- */
+function setMode(m){ S.mode = m; document.body.classList.toggle('mark', m === 'mark'); document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); }
+$('#modeSeg').addEventListener('click', e => { const m = e.target.dataset.m; if (m) setMode(m); });
+
+/* ---------- score ---------- */
+function renderScore(){
+  const host = $('#score'); host.innerHTML = '';
+  if (!S.pages.length) {
+    host.innerHTML = `<div class="empty"><b>開始使用</b><ol>
+      <li>打開上方「設定」，加入樂譜（圖片或 PDF）和演奏影片。</li>
+      <li>切到「標記」模式，播放影片、在每個樂句開頭暫停，點一下樂譜上對應的位置。</li>
+      <li>切回「播放」模式，點樂譜上的標記點，影片就會跳到那裡。換另一個演奏版本時，會自動跳到同一個段落。</li></ol></div>`;
+    return;
+  }
+  S.pages.forEach((p, i) => {
+    const w = document.createElement('div'); w.className = 'page'; w.dataset.page = p.id; w.style.width = S.zoom + '%';
+    w.innerHTML = `<img src="${pageUrls[p.id]}" alt="第 ${i + 1} 頁"><span class="pno">p.${i + 1}</span>`;
+    w.querySelector('img').addEventListener('load', () => { if (S.fit) sizePages(); });
+    w.addEventListener('click', e => onPageClick(e, p.id, w));
+    S.markers.filter(m => m.page === p.id).forEach(m => w.appendChild(markerEl(m)));
+    host.appendChild(w);
+  });
+  activeId = null;
+}
+function markerEl(m){
+  const b = document.createElement('button'); b.className = 'mk'; b.dataset.id = m.id;
+  b.style.left = (m.x * 100) + '%'; b.style.top = (m.y * 100) + '%';
+  b.textContent = m.label; if (S.cur && m.times[S.cur] != null) b.classList.add('has');
+  b.title = m.note || '';
+  b.addEventListener('click', e => { e.stopPropagation(); onMarkerClick(m.id); });
+  return b;
+}
+function refreshMarkers(){ document.querySelectorAll('.mk').forEach(b => { const m = getM(b.dataset.id); if (!m) return b.remove(); b.textContent = m.label; b.title = m.note || ''; b.classList.toggle('has', !!S.cur && m.times[S.cur] != null); b.classList.toggle('now', m.id === activeId); }); }
+function nextLabel(){ let mx = 0; S.markers.forEach(m => { const n = parseInt(m.label, 10); if (!isNaN(n) && n > mx) mx = n; }); return String(mx + 1); }
+
+let moveId = null;
+function nearestMarker(e, pageId, w){
+  const r = w.getBoundingClientRect(); let best = null, bd = 28;
+  S.markers.forEach(m => { if (m.page !== pageId) return;
+    const d = Math.hypot(r.left + m.x * r.width - e.clientX, r.top + m.y * r.height - e.clientY);
+    if (d < bd) { bd = d; best = m; } });
+  return best;
+}
+let keepN = 8;
+function renderMList(){
+  const host = $('#mlist'); if (!host) return;
+  if (!S.markers.length) { host.innerHTML = '<div class="hint">還沒有標記點。</div>'; return; }
+  host.innerHTML = `<div class="vrow">按新增順序保留前 <input type="number" id="keepN" min="0" value="${keepN}" style="flex:0 0 70px"> 個，<button id="trimBtn" class="danger">刪除其餘的</button></div>
+    <div class="hint">共 ${S.markers.length} 個，依新增順序：</div>
+    <div>${S.markers.map((m, i) => `<span class="mchip">${i + 1}. ${esc(m.label)}<button data-del="${m.id}" aria-label="刪除">×</button></span>`).join('')}</div>`;
+}
+document.addEventListener('input', e => { if (e.target.id === 'keepN') keepN = Math.max(0, parseInt(e.target.value, 10) || 0); });
+document.addEventListener('click', async e => {
+  if (e.target.id === 'trimBtn') {
+    const gone = S.markers.slice(keepN); if (!gone.length) return toast('沒有需要刪除的標記點');
+    if (!(await ask(`刪除第 ${keepN} 個之後的 ${gone.length} 個標記點（${gone.map(m => m.label).join('、')}）？`, '刪除'))) return;
+    S.markers = S.markers.slice(0, keepN); save(); renderScore(); toast(`已刪除 ${gone.length} 個標記點`);
+  } else if (e.target.dataset && e.target.dataset.del) {
+    const m = getM(e.target.dataset.del); if (!m) return;
+    if (!(await ask(`刪除標記「${m.label}」？`, '刪除'))) return;
+    S.markers = S.markers.filter(x => x.id !== m.id); save(); renderScore();
+  }
+});
+function onPageClick(e, pageId, w){
+  if (moveId) {
+    const m = getM(moveId); moveId = null; document.body.classList.remove('moving');
+    if (!m) return;
+    const r = w.getBoundingClientRect();
+    m.page = pageId; m.x = (e.clientX - r.left) / r.width; m.y = (e.clientY - r.top) / r.height;
+    save(); renderScore(); toast(`已移動「${m.label}」`);
+    return;
+  }
+  const near = nearestMarker(e, pageId, w);
+  if (near) { onMarkerClick(near.id); return; }
+  if (S.mode !== 'mark') return;
+  if (!S.cur) { toast('請先在設定中新增演奏版本'); $('#setup').open = true; return; }
+  if (!videoUrls[S.cur]) { toast('這個版本還沒有影片檔'); return; }
+  const r = w.getBoundingClientRect();
+  const m = { id: uid(), page: pageId, x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, label: nextLabel(), note: '', times: {} };
+  m.times[S.cur] = Math.round(video.currentTime * 100) / 100;
+  S.markers.push(m); w.appendChild(markerEl(m)); save();
+  toast(`已新增「${m.label}」＝ ${curV().name} ${fmt(m.times[S.cur])}`);
+}
+function onMarkerClick(id){
+  const m = getM(id); if (!m) return;
+  if (S.mode === 'mark') {
+    if (S.cur && videoUrls[S.cur] && m.times[S.cur] == null) {
+      m.times[S.cur] = Math.round(video.currentTime * 100) / 100; save(); refreshMarkers();
+      toast(`「${m.label}」在 ${curV().name} 設為 ${fmt(m.times[S.cur])}`);
+    } else openEditor(id);
+    return;
+  }
+  jump(id);
+}
+function jump(id){
+  const m = getM(id); if (!m || !S.cur) return;
+  const t = m.times[S.cur];
+  if (t == null) { toast(`「${m.label}」在這個版本還沒有時間點`); openEditor(id); return; }
+  if (!videoUrls[S.cur]) { toast('這個版本還沒有影片檔'); return; }
+  seekTo(t); seg = segFromTime(t);
+  video.play().catch(() => {});
+}
+
+/* ---------- marker editor ---------- */
+function openEditor(id){
+  const m = getM(id); if (!m) return;
+  modal._onClose = () => { readEditor(m); };
+  const rows = S.versions.map(v => {
+    const t = m.times[v.id], isCur = v.id === S.cur;
+    return `<div class="trow ${isCur ? 'curv' : ''}"><span class="vn">${esc(v.name)}</span><span class="tv">${fmt(t)}</span>
+      ${isCur ? `<button data-a="setnow">設為目前時間</button>${t != null ? '<button data-a="nudge" data-d="-0.2">−0.2</button><button data-a="nudge" data-d="0.2">+0.2</button>' : ''}` : ''}
+      ${t != null ? `<button data-a="clear" data-v="${v.id}">清除</button>` : ''}</div>`;
+  }).join('');
+  box.innerHTML = `<h3>標記點</h3>
+    <label>名稱（小節號、排練記號…）<input id="eLabel" value="${esc(m.label)}"></label>
+    <label>處理筆記<textarea id="eNote" rows="3" placeholder="例如：輪音由疏到密、這裡稍微拉寬、句尾收輕">${esc(m.note)}</textarea></label>
+    <div class="times"><div class="sub">各版本的時間點（● 是目前版本）</div>${rows || '<div class="sub">尚未新增演奏版本</div>'}</div>
+    <div class="row"><button data-a="del" class="danger">刪除標記</button><button data-a="move">移動位置</button><span class="sp"></span>
+      ${S.cur && m.times[S.cur] != null ? '<button data-a="go">播放這段</button>' : ''}<button data-a="close" class="pri">完成</button></div>`;
+  modal.classList.remove('hidden');
+  box.onclick = async e => {
+    const a = e.target.dataset.a; if (!a) return;
+    readEditor(m);
+    if (a === 'setnow') { if (!videoUrls[S.cur]) return toast('這個版本還沒有影片檔'); m.times[S.cur] = Math.round(video.currentTime * 100) / 100; save(); refreshMarkers(); openEditor(id); }
+    else if (a === 'nudge') { m.times[S.cur] = Math.max(0, Math.round((m.times[S.cur] + parseFloat(e.target.dataset.d)) * 100) / 100); seekTo(m.times[S.cur]); save(); openEditor(id); }
+    else if (a === 'clear') { delete m.times[e.target.dataset.v]; save(); refreshMarkers(); openEditor(id); }
+    else if (a === 'del') { closeModal(); if (await ask(`刪除標記「${m.label}」？`, '刪除')) { S.markers = S.markers.filter(x => x.id !== id); save(); refreshMarkers(); } }
+    else if (a === 'go') { closeModal(); jump(id); }
+    else if (a === 'move') { closeModal(); moveId = id; document.body.classList.add('moving'); toast(`點樂譜上的新位置來放「${m.label}」`, 4000); }
+    else if (a === 'close') { closeModal(); }
+  };
+}
+function readEditor(m){
+  const l = $('#eLabel'), n = $('#eNote'); if (!l) return;
+  m.label = l.value.trim() || m.label; m.note = n.value; save(); refreshMarkers(); updateInfo();
+}
+
+/* ---------- versions & video ---------- */
+function renderTabs(){
+  const t = $('#tabs');
+  t.innerHTML = S.versions.map(v => `<button data-v="${v.id}" class="${v.id === S.cur ? 'cur' : ''}">${isAudioV(v) ? '♪ ' : ''}${esc(v.name)}</button>`).join('');
+}
+$('#tabs').addEventListener('click', e => { const v = e.target.dataset.v; if (v) switchVersion(v); });
+function switchVersion(vid){
+  if (vid === S.cur) return;
+  const act = activeId ? getM(activeId) : null;
+  const wasPlaying = !video.paused;
+  S.cur = vid; save(); renderTabs(); refreshMarkers();
+  pending = { t: act && act.times[vid] != null ? act.times[vid] : null, play: wasPlaying };
+  loadVideo();
+  if (act) toast(act.times[vid] != null ? `${curV().name}：跳到「${act.label}」` : `「${act.label}」在 ${curV().name} 還沒有時間點`);
+}
+function loadVideo(){
+  const url = S.cur ? videoUrls[S.cur] : null;
+  $('#novideo').style.display = url ? 'none' : 'flex';
+  updateVideoDisplay();
+  if (!S.versions.length) $('#novideo').textContent = '先在「設定」新增演奏版本（影片或音檔）';
+  else if (!url) $('#novideo').textContent = '這個版本需要重新選擇影片檔（在「設定」裡）';
+  if (url) { if (video.src !== url) video.src = url; } else { video.removeAttribute('src'); video.load(); }
+  seg = null; activeId = null; updateInfo();
+}
+video.addEventListener('loadedmetadata', () => {
+  const cv = curV(); if (cv && !cv.kind) { cv.kind = video.videoWidth ? 'video' : 'audio'; save(); renderTabs(); updateVideoDisplay(); }
+  video.playbackRate = S.rate; try { video.preservesPitch = true; video.webkitPreservesPitch = true; } catch(e){}
+  if (pending) { if (pending.t != null) { seekTo(pending.t); seg = segFromTime(pending.t); } if (pending.play) video.play().catch(() => {}); pending = null; }
+});
+video.addEventListener('seeked', () => { if (internalSeek) { internalSeek = false; return; } if (S.loop) seg = segFromTime(video.currentTime); });
+const MIME_BY_EXT = { mp4: 'video/mp4', m4v: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm', mkv: 'video/x-matroska', ogv: 'video/ogg', m4a: 'audio/mp4', mp3: 'audio/mpeg', wav: 'audio/wav', aac: 'audio/aac', flac: 'audio/flac', ogg: 'audio/ogg' };
+function guessMime(name){ const m = /\.([a-z0-9]+)$/i.exec(name || ''); return m ? MIME_BY_EXT[m[1].toLowerCase()] || '' : ''; }
+function fmtSize(n){ return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB'; }
+function playCheck(v){
+  const b = videoBlobs[v.id]; if (!b) return '';
+  const type = b.type || guessMime(v.fileName);
+  const can = type ? video.canPlayType(type) : '';
+  const verdict = can === 'probably' ? '這台裝置支援' : can === 'maybe' ? '這台裝置可能支援（要看編碼）' : '這台裝置不支援這種格式';
+  return `${esc(v.fileName || '')}｜${fmtSize(b.size)}｜${esc(type || '未知格式')}｜${verdict}`;
+}
+const MEDIA_ERR = { 1: '播放被中止', 2: '讀取影片時發生錯誤', 3: '影片解碼失敗（這台裝置不支援影片的編碼，例如 VP9 或 AV1）', 4: '這台裝置不支援這個影片格式或編碼' };
+video.addEventListener('error', () => {
+  if (!(S.cur && videoUrls[S.cur])) return;
+  const code = video.error ? video.error.code : 0;
+  const msg = `影片無法播放：${MEDIA_ERR[code] || '未知原因'}（錯誤代碼 ${code}）`;
+  toast(msg, 5000);
+  $('#novideo').style.display = 'flex'; $('#novideo').textContent = msg + '。詳細資訊在「設定 → 演奏版本」。';
+  const v = curV(); if (v) { v._err = msg; renderVList(); }
+});
+
+function renderVList(){
+  const host = $('#vlist');
+  if (!S.versions.length) { host.innerHTML = '<div class="hint">還沒有版本。</div>'; return; }
+  host.innerHTML = S.versions.map(v => `<div class="vrow" data-v="${v.id}">
+      <input value="${esc(v.name)}" data-a="name" aria-label="版本名稱">
+      <span class="st ${videoUrls[v.id] ? '' : 'bad'}">${videoUrls[v.id] ? '影片已就緒' : '需要重新選擇影片'}</span>
+      <label class="file"><input type="file" accept="video/*,audio/*" data-a="relink"><span>換檔案</span></label>
+      <button class="danger" data-a="del">刪除</button>
+      <div class="hint" style="flex-basis:100%">${playCheck(v)}${v._err ? `<br><span style="color:var(--acc)">${esc(v._err)}</span>` : ''}</div></div>`).join('');
+}
+$('#vlist').addEventListener('change', async e => {
+  const row = e.target.closest('.vrow'); if (!row) return; const v = S.versions.find(x => x.id === row.dataset.v);
+  if (e.target.dataset.a === 'name') { v.name = e.target.value.trim() || v.name; save(); renderTabs(); }
+  if (e.target.dataset.a === 'relink' && e.target.files[0]) { v.kind = null; await attachVideo(v, e.target.files[0]); renderVList(); if (v.id === S.cur) loadVideo(); }
+});
+$('#vlist').addEventListener('click', async e => {
+  if (e.target.dataset.a !== 'del') return;
+  const row = e.target.closest('.vrow'); const v = S.versions.find(x => x.id === row.dataset.v);
+  if (!(await ask(`刪除版本「${v.name}」？（這個版本的時間點也會一起刪除）`, '刪除'))) return;
+  S.versions = S.versions.filter(x => x.id !== v.id); S.markers.forEach(m => delete m.times[v.id]);
+  if (videoUrls[v.id]) URL.revokeObjectURL(videoUrls[v.id]); delete videoUrls[v.id]; idbDel('video:' + v.id);
+  if (S.cur === v.id) S.cur = S.versions[0]?.id || null;
+  save(); renderVList(); renderTabs(); refreshMarkers(); loadVideo();
+});
+async function attachVideo(v, file){
+  if (!file.type && guessMime(file.name)) file = new Blob([file], { type: guessMime(file.name) });
+  if (videoUrls[v.id]) URL.revokeObjectURL(videoUrls[v.id]);
+  videoUrls[v.id] = URL.createObjectURL(file); videoBlobs[v.id] = file; if (file.name) v.fileName = file.name; v._err = null;
+  save();
+  idbSet('video:' + v.id, file).then(ok => { if (!ok) toast('影片太大，無法存進瀏覽器；下次需要重新選擇檔案', 3500); });
+}
+async function addVersions(e, asAudio){
+  const files = [...e.target.files]; e.target.value = '';
+  for (const f of files) {
+    const v = { id: uid(), name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name };
+    if (asAudio || (f.type || guessMime(f.name)).startsWith('audio')) { v.kind = 'audio'; if (S.fit == null) S.fit = true; }
+    S.versions.push(v); await attachVideo(v, f);
+    if (!S.cur) S.cur = v.id;
+  }
+  save(); renderVList(); renderTabs(); refreshMarkers(); loadVideo();
+  if (files.length) toast(`已新增 ${files.length} 個版本，可在下方改成演奏家的名字`);
+}
+$('#videoIn').addEventListener('change', e => addVersions(e, false));
+$('#audioIn').addEventListener('change', e => addVersions(e, true));
+
+/* ---------- score pages ---------- */
+async function addPage(blob){
+  const p = { id: uid() }; S.pages.push(p); pageUrls[p.id] = URL.createObjectURL(blob); pageBlobs[p.id] = blob;
+  await idbSet('page:' + p.id, blob);
+}
+$('#scoreIn').addEventListener('change', async e => {
+  const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })); e.target.value = '';
+  for (const f of files) {
+    if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
+      if (!window.pdfjsLib) { toast('PDF 元件載入失敗，請改用圖片檔'); continue; }
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ data: await f.arrayBuffer() }).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          toast(`轉換 PDF：第 ${i} / ${pdf.numPages} 頁`, 60000);
+          const page = await pdf.getPage(i); const vp0 = page.getViewport({ scale: 1 });
+          const vp = page.getViewport({ scale: Math.min(3, 1800 / vp0.width) });
+          const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+          const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+          await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
+          await addPage(blob);
+        }
+        toast('PDF 已加入');
+      } catch(err) { toast('PDF 讀取失敗，請改用圖片檔'); }
+    } else if (f.type.startsWith('image/')) await addPage(f);
+  }
+  save(); renderScore(); renderThumbs();
+});
+function renderThumbs(){
+  $('#thumbs').innerHTML = S.pages.map((p, i) => `<div class="thumb"><img src="${pageUrls[p.id]}" alt=""><span>p.${i + 1}</span><button data-p="${p.id}" class="danger" aria-label="刪除">×</button></div>`).join('');
+}
+$('#thumbs').addEventListener('click', async e => {
+  const id = e.target.dataset.p; if (!id) return;
+  const n = S.markers.filter(m => m.page === id).length;
+  if (!(await ask(n ? `刪除這一頁？（上面的 ${n} 個標記點也會刪除）` : '刪除這一頁？', '刪除'))) return;
+  S.pages = S.pages.filter(p => p.id !== id); S.markers = S.markers.filter(m => m.page !== id); idbDel('page:' + id);
+  save(); renderScore(); renderThumbs();
+});
+
+/* ---------- audio only ---------- */
+let seeking = false;
+function isAudioV(v){ if (!v) return false; if (v.kind) return v.kind === 'audio'; const b = videoBlobs[v.id]; return ((b && b.type) || guessMime(v.fileName) || '').startsWith('audio'); }
+function updateVideoDisplay(){
+  const url = S.cur ? videoUrls[S.cur] : null;
+  const pureAudio = isAudioV(curV());
+  const audioMode = !!S.audioOnly || pureAudio;
+  video.style.display = url && !audioMode ? 'block' : 'none';
+  $('#abar').style.display = url && audioMode ? 'flex' : 'none';
+  $('#audioBtn').classList.toggle('on', audioMode);
+  $('#audioBtn').disabled = pureAudio;
+  $('#audioBtn').textContent = pureAudio ? '純音檔' : '只聽聲音';
+  document.body.classList.toggle('audio', audioMode);
+  requestAnimationFrame(sizePages);
+}
+function sizePages(){
+  document.body.classList.toggle('fit', !!S.fit);
+  $('#fitBtn').classList.toggle('on', !!S.fit);
+  document.querySelector('.zoomctl').style.display = S.fit ? 'none' : '';
+  const wide = matchMedia('(min-width:900px)').matches;
+  const barH = (S.audioOnly || !wide) ? $('#player').offsetHeight : 0;
+  document.documentElement.style.setProperty('--bar', barH + 'px');
+  const avail = innerHeight - barH - 20;
+  const host = $('#score'), cw = host.clientWidth;
+  host.querySelectorAll('.page').forEach(pg => {
+    const img = pg.querySelector('img');
+    if (S.fit && img.naturalWidth) pg.style.width = Math.min(cw, Math.round(avail * img.naturalWidth / img.naturalHeight)) + 'px';
+    else pg.style.width = S.zoom + '%';
+  });
+}
+window.addEventListener('resize', () => requestAnimationFrame(sizePages));
+$('#fitBtn').onclick = () => { S.fit = !S.fit; sizePages(); save(); };
+$('#audioBtn').onclick = () => { S.audioOnly = !S.audioOnly; if (S.audioOnly) { S.fit = true; $('#setup').open = false; } updateVideoDisplay(); save(); toast(S.audioOnly ? '只聽聲音：樂譜全螢幕顯示' : '已顯示影片畫面'); };
+$('#pp').onclick = () => { video.paused ? video.play().catch(() => {}) : video.pause(); };
+video.addEventListener('play', () => { $('#pp').textContent = '⏸'; });
+video.addEventListener('pause', () => { $('#pp').textContent = '▶'; });
+$('#seek').addEventListener('input', () => { seeking = true; if (video.duration) $('#atime').textContent = fmt($('#seek').value / 1000 * video.duration) + ' / ' + fmt(video.duration); });
+$('#seek').addEventListener('change', () => { if (video.duration) video.currentTime = $('#seek').value / 1000 * video.duration; seeking = false; });
+
+/* ---------- controls ---------- */
+$('#back').onclick = () => { video.currentTime = Math.max(0, video.currentTime - 2); };
+$('#fwd').onclick = () => { video.currentTime = video.currentTime + 2; };
+$('#rate').onchange = e => { S.rate = parseFloat(e.target.value); video.playbackRate = S.rate; save(); };
+$('#loopBtn').onclick = () => { S.loop = !S.loop; $('#loopBtn').classList.toggle('on', S.loop); seg = S.loop ? segFromTime(video.currentTime) : null; updateInfo(); };
+$('#followBtn').onclick = () => { S.follow = !S.follow; $('#followBtn').classList.toggle('on', S.follow); save(); };
+$('#zoom').oninput = e => { S.zoom = +e.target.value; $('#zoomVal').textContent = S.zoom + '%'; sizePages(); save(); };
+document.addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !modal.classList.contains('hidden')) return;
+  if (e.code === 'Space') { e.preventDefault(); video.paused ? video.play().catch(() => {}) : video.pause(); }
+  else if (e.key === 'ArrowLeft') video.currentTime = Math.max(0, video.currentTime - 2);
+  else if (e.key === 'ArrowRight') video.currentTime += 2;
+  else if (e.key === 'm' || e.key === 'M') setMode(S.mode === 'mark' ? 'play' : 'mark');
+});
+
+function updateInfo(){
+  const m = activeId ? getM(activeId) : null;
+  let h = m ? `目前：<b>${esc(m.label)}</b>${m.note ? ` <span class="note">｜${esc(m.note)}</span>` : ''}` : (S.cur ? '<span style="color:#999">點樂譜上的標記點來跳轉</span>' : '');
+  if (S.loop && seg) h += `<br><span style="color:#9fd3cd">循環 ${fmt(seg.start)} – ${seg.end > 1e8 ? '結尾' : fmt(seg.end)}</span>`;
+  $('#info').innerHTML = h;
+}
+function scrollToMarker(el){
+  const wide = matchMedia('(min-width:900px)').matches;
+  const top = (wide && !S.audioOnly) ? 0 : $('#player').getBoundingClientRect().bottom;
+  const r = el.getBoundingClientRect();
+  if (r.top > top + 30 && r.bottom < innerHeight - 60) return;
+  window.scrollBy({ top: r.top - (top + (innerHeight - top) * 0.3), behavior: 'smooth' });
+}
+function tick(){
+  if (S.cur && videoUrls[S.cur]) {
+    const t = video.currentTime;
+    if (S.loop && seg && !video.paused && t >= seg.end - 0.04) seekTo(seg.start);
+    const a = activeAt(t), id = a ? a.id : null;
+    if (id !== activeId) {
+      activeId = id; refreshMarkers(); updateInfo();
+      if (a && S.follow && !video.paused) { const el = document.querySelector(`.mk[data-id="${id}"]`); if (el) scrollToMarker(el); }
+    }
+    $('#time').textContent = fmt(t);
+    if (S.audioOnly) { if (!seeking && video.duration) $('#seek').value = Math.round(t / video.duration * 1000); $('#atime').textContent = fmt(t) + ' / ' + fmt(video.duration); }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------- backup ---------- */
+$('#exportBtn').onclick = () => {
+  const idx = Object.fromEntries(S.pages.map((p, i) => [p.id, i]));
+  const data = { app: 'score-video-sync', v: 1, versions: S.versions.map(v => ({ id: v.id, name: v.name, fileName: v.fileName })),
+    markers: S.markers.map(m => ({ ...m, page: idx[m.page] })) };
+  $('#ioArea').innerHTML = `<textarea class="io" id="ioText" readonly></textarea><div class="row" style="display:flex;gap:8px;margin-top:6px"><button id="copyBtn">複製</button></div>`;
+  $('#ioText').value = JSON.stringify(data);
+  $('#copyBtn').onclick = () => { navigator.clipboard.writeText($('#ioText').value).then(() => toast('已複製，可以貼到筆記裡保存'), () => { $('#ioText').select(); toast('請手動全選後複製'); }); };
+};
+$('#importBtn').onclick = () => {
+  $('#ioArea').innerHTML = `<textarea class="io" id="ioText" placeholder="把備份文字貼在這裡"></textarea><div style="display:flex;gap:8px;margin-top:6px"><button id="doImport" class="pri">匯入（會取代目前的標記）</button></div>`;
+  $('#doImport').onclick = () => {
+    let d; try { d = JSON.parse($('#ioText').value); } catch(e) { return toast('格式不正確'); }
+    if (d.app !== 'score-video-sync') return toast('這不是這個工具的備份');
+    if (!S.pages.length) return toast('請先加入同一份樂譜，再匯入');
+    let dropped = 0;
+    S.versions = d.versions.map(v => ({ ...v }));
+    S.markers = d.markers.filter(m => { if (S.pages[m.page]) return true; dropped++; return false; }).map(m => ({ ...m, page: S.pages[m.page].id }));
+    if (!S.versions.find(v => v.id === S.cur)) S.cur = S.versions[0]?.id || null;
+    save(); renderVList(); renderTabs(); renderScore(); loadVideo(); $('#ioArea').innerHTML = '';
+    toast(dropped ? `已匯入，有 ${dropped} 個標記點的頁面不存在` : '已匯入；請在版本清單中選擇對應的影片檔', 3500);
+  };
+};
+$('#resetBtn').onclick = async () => {
+  if (!(await ask('清空這首曲目的樂譜、版本和標記點？這個動作無法復原。', '清空'))) return;
+  for (const p of S.pages) idbDel('page:' + p.id);
+  for (const v of S.versions) idbDel('video:' + v.id);
+  Object.values(pageUrls).concat(Object.values(videoUrls)).forEach(u => URL.revokeObjectURL(u));
+  S.pages = []; S.versions = []; S.markers = []; S.cur = null; save();
+  renderScore(); renderThumbs(); renderVList(); renderTabs(); loadVideo(); $('#setup').open = true;
+};
+
+/* ---------- full export / import ---------- */
+function readB64(blob){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(blob); }); }
+async function blobToB64Parts(blob){ const CH = 6 * 1024 * 1024; const out = []; for (let i = 0; i < blob.size; i += CH) out.push(await readB64(blob.slice(i, i + CH))); return out; }
+function b64ToBlob(b64, mime){
+  const parts = [], CH = 4 * 1024 * 1024;
+  for (let i = 0; i < b64.length; i += CH) { const bin = atob(b64.slice(i, i + CH)); const u = new Uint8Array(bin.length); for (let j = 0; j < bin.length; j++) u[j] = bin.charCodeAt(j); parts.push(u); }
+  return new Blob(parts, { type: mime });
+}
+async function loadPack(meta, getMedia, persist){
+  if (!meta || meta.app !== 'score-video-sync' || !meta.pages) throw new Error('bad');
+  resetState();
+  const map = {}; const nid = id => persist ? (map[id] = map[id] || uid()) : id;
+  for (const oid of meta.pages) { const m = getMedia(oid); if (!m) continue; const id = nid(oid); const b = b64ToBlob(m.b64, m.mime); S.pages.push({ id }); pageUrls[id] = URL.createObjectURL(b); pageBlobs[id] = b; if (persist) await idbSet('page:' + id, b); }
+  S.versions = (meta.versions || []).map(v => ({ id: nid(v.id), name: v.name, fileName: v.fileName, kind: v.kind, _old: v.id }));
+  for (const v of S.versions) { const m = getMedia(v._old); delete v._old; if (!m) continue; const b = b64ToBlob(m.b64, guessMime(v.fileName) || m.mime); videoUrls[v.id] = URL.createObjectURL(b); videoBlobs[v.id] = b; if (persist) await idbSet('video:' + v.id, b); }
+  const ids = new Set(S.pages.map(p => p.id));
+  S.markers = (meta.markers || []).map(m => { const times = {}; for (const k in m.times) times[persist ? nid(k) : k] = m.times[k]; return { ...m, id: persist ? uid() : m.id, page: persist ? map[m.page] : m.page, times }; }).filter(m => ids.has(m.page));
+  const cur = persist ? map[meta.cur] : meta.cur;
+  S.cur = S.versions.find(v => v.id === cur) ? cur : (S.versions[0] ? S.versions[0].id : null);
+  S.follow = meta.follow !== false; S.audioOnly = !!meta.audioOnly; S.fit = meta.fit;
+  S.zoom = meta.zoom || 100; S.rate = meta.rate || 1;
+}
+async function offerDownload(blob, filename){
+  let dl = null;
+  try { if (window.claude && typeof window.claude.use === 'function') dl = await window.claude.use('downloads'); } catch(e){}
+  if (dl) {
+    try { await dl.save({ filename, data: blob }); toast('已下載'); }
+    catch(err) { toast(err && err.code === 'declined' ? '已取消下載' : err && err.code === 'too_large' ? '檔案太大，無法下載' : '下載失敗'); }
+    return;
+  }
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); }
+  catch(e) { toast('這裡無法下載檔案'); }
+}
+$('#packBtn').onclick = async () => {
+  if (!TEMPLATE) return toast('無法匯出');
+  if (!S.pages.length && !S.versions.length) return toast('目前沒有內容可以匯出');
+  const missing = S.versions.filter(v => !videoBlobs[v.id]);
+  let total = 0; S.pages.forEach(p => total += pageBlobs[p.id] ? pageBlobs[p.id].size : 0); S.versions.forEach(v => total += videoBlobs[v.id] ? videoBlobs[v.id].size : 0);
+  let msg = `要匯出約 ${Math.max(1, Math.round(total * 1.35 / 1048576))} MB 的檔案嗎？`;
+  if (missing.length) msg += `（${missing.map(v => v.name).join('、')} 目前沒有影片檔，只會匯出它的標記時間）`;
+  if (!(await ask(msg, '匯出'))) return;
+  const st = $('#packStatus'); st.textContent = '打包中…';
+  try {
+    const meta = { app: 'score-video-sync', v: 3, name: projName(), pages: S.pages.map(p => p.id), versions: S.versions.map(v => ({ id: v.id, name: v.name, fileName: v.fileName, kind: v.kind })), markers: S.markers, cur: S.cur, zoom: S.zoom, rate: S.rate, follow: S.follow, audioOnly: S.audioOnly, fit: S.fit };
+    const i = TEMPLATE.indexOf('</head>');
+    const parts = [TEMPLATE.slice(0, i), '<script type="application/json" id="embedded">', JSON.stringify(meta).replace(/</g, '\\u003c'), '<\/script>\n'];
+    const media = S.pages.map(p => [p.id, pageBlobs[p.id]]).concat(S.versions.map(v => [v.id, videoBlobs[v.id]])).filter(x => x[1]);
+    let n = 0;
+    for (const [id, b] of media) {
+      n++; st.textContent = `打包中… ${n} / ${media.length}`;
+      parts.push(`<script type="application/octet-base64" id="m-${id}" data-mime="${esc(b.type || guessMime((S.versions.find(v => v.id === id) || {}).fileName) || 'application/octet-stream')}">`);
+      for (const c of await blobToB64Parts(b)) parts.push(c);
+      parts.push('<\/script>\n');
+    }
+    parts.push(TEMPLATE.slice(i));
+    const out = new Blob(parts, { type: 'text/html' });
+    st.textContent = STANDALONE ? $('#packStatus').dataset.note || '' : '';
+    await offerDownload(out, `${(projName() || '樂譜影片對照').replace(/[\\/:*?"<>|]/g, '_').slice(0, 60)}.html`);
+  } catch(e) { st.textContent = ''; toast('打包失敗，可能是影片太大', 3500); }
+};
+$('#openPack').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const st = $('#packStatus'); st.textContent = '讀取中…';
+  try {
+    const text = await f.text();
+    const mm = text.match(/<script type="application\/json" id="embedded">([\s\S]*?)<\/script>/);
+    if (!mm) throw new Error('no data');
+    const media = {}; const re = /<script type="application\/octet-base64" id="m-([^"]+)" data-mime="([^"]*)">([^<]*)<\/script>/g; let r;
+    while ((r = re.exec(text))) media[r[1]] = { mime: r[2], b64: r[3] };
+    const meta = JSON.parse(mm[1]);
+    const name = uniqueName(meta.name || f.name.replace(/\.html?$/i, '') || '匯入的曲目');
+    await flushSave(); video.pause();
+    const pid = uid(); P.list.push({ id: pid, name }); P.current = pid; await idbSet('projects', P);
+    await loadPack(meta, id => media[id], true);
+    await flushSave(); renderAll();
+    st.textContent = ''; toast(`已新增曲目「${name}」，資料也存進這台裝置了`, 3500);
+  } catch(err) { st.textContent = ''; toast('無法讀取：不是這個工具匯出的檔案，或檔案太大', 3500); }
+});
+
+/* ---------- songs (projects) ---------- */
+function projName(){ const p = P.list.find(x => x.id === P.current); return p ? p.name : ''; }
+function uniqueName(n){ let name = n, i = 2; while (P.list.some(p => p.name === name)) name = `${n} (${i++})`; return name; }
+function resetState(){
+  [pageUrls, videoUrls].forEach(o => { for (const k in o) { URL.revokeObjectURL(o[k]); delete o[k]; } });
+  [pageBlobs, videoBlobs].forEach(o => { for (const k in o) delete o[k]; });
+  S.pages = []; S.versions = []; S.markers = []; S.cur = null; S.zoom = 100; S.follow = true; S.rate = 1; S.audioOnly = false; S.fit = undefined; S.loop = false;
+  seg = null; activeId = null;
+}
+async function loadProjectData(key){
+  resetState();
+  const meta = await idbGet(key);
+  if (!meta) return;
+  S.versions = meta.versions || []; S.markers = meta.markers || []; S.cur = meta.cur || (S.versions[0] ? S.versions[0].id : null);
+  S.zoom = meta.zoom || 100; S.follow = meta.follow !== false; S.rate = meta.rate || 1; S.audioOnly = !!meta.audioOnly; S.fit = meta.fit;
+  for (const id of meta.pageIds || []) { const b = await idbGet('page:' + id); if (b) { S.pages.push({ id }); pageUrls[id] = URL.createObjectURL(b); pageBlobs[id] = b; } }
+  const ids = new Set(S.pages.map(p => p.id)); S.markers = S.markers.filter(m => ids.has(m.page));
+  for (const v of S.versions) { const f = await idbGet('video:' + v.id); if (f) { videoUrls[v.id] = URL.createObjectURL(f); videoBlobs[v.id] = f; } }
+}
+function renderProjects(){
+  $('#projSel').innerHTML = P.list.map(p => `<option value="${p.id}" ${p.id === P.current ? 'selected' : ''}>${esc(p.name)}</option>`).join('') + '<option value="__new">＋ 新增曲目…</option>';
+}
+function renderAll(){
+  $('#zoom').value = S.zoom; $('#zoomVal').textContent = S.zoom + '%';
+  $('#rate').value = String(S.rate); $('#followBtn').classList.toggle('on', S.follow); $('#loopBtn').classList.remove('on');
+  $('#setup').open = !S.pages.length || !S.versions.length;
+  renderScore(); renderThumbs(); renderVList(); renderTabs(); loadVideo(); updateInfo(); renderMList(); renderProjects();
+}
+async function switchProject(pid){
+  if (pid === P.current) return;
+  await flushSave(); video.pause();
+  P.current = pid; await idbSet('projects', P);
+  await loadProjectData(metaKey()); renderAll(); window.scrollTo(0, 0);
+  toast(`已切換到「${projName()}」`);
+}
+function nameDialog(title, value){ return new Promise(res => {
+  modal._onClose = () => res(null);
+  box.innerHTML = `<h3>${esc(title)}</h3><label>曲目名稱<input id="pName" value="${esc(value)}"></label><div class="row"><span class="sp"></span><button data-a="no">取消</button><button data-a="ok" class="pri">確定</button></div>`;
+  modal.classList.remove('hidden'); setTimeout(() => { const i = $('#pName'); i.focus(); i.select(); }, 50);
+  const done = ok => { const v = $('#pName').value.trim(); closeModal(); res(ok && v ? v : null); };
+  box.onclick = e => { const a = e.target.dataset.a; if (a) done(a === 'ok'); };
+  $('#pName').onkeydown = e => { if (e.key === 'Enter') done(true); };
+}); }
+async function newProject(){
+  const name = await nameDialog('新增曲目', uniqueName('新曲目'));
+  if (!name) return renderProjects();
+  const id = uid(); P.list.push({ id, name: uniqueName(name) });
+  await switchProject(id); $('#setup').open = true;
+}
+$('#projSel').addEventListener('change', e => { const v = e.target.value; if (v === '__new') newProject(); else switchProject(v); });
+$('#projMenu').onclick = () => {
+  modal._onClose = null;
+  box.innerHTML = `<h3>${esc(projName())}</h3><div class="row" style="flex-direction:column;align-items:stretch">
+    <button data-a="new">＋ 新增曲目</button><button data-a="rename">重新命名這首曲目</button><button data-a="del" class="danger">刪除這首曲目</button><button data-a="no">取消</button></div>`;
+  modal.classList.remove('hidden');
+  box.onclick = async e => {
+    const a = e.target.dataset.a; if (!a) return; closeModal();
+    if (a === 'new') newProject();
+    else if (a === 'rename') { const n = await nameDialog('重新命名', projName()); if (n) { P.list.find(p => p.id === P.current).name = n; await idbSet('projects', P); renderProjects(); } }
+    else if (a === 'del') {
+      if (!(await ask(`刪除曲目「${projName()}」？裡面的樂譜、影片和標記都會從這台裝置刪除。`, '刪除'))) return;
+      for (const p of S.pages) idbDel('page:' + p.id); for (const v of S.versions) idbDel('video:' + v.id); idbDel(metaKey());
+      P.list = P.list.filter(p => p.id !== P.current);
+      if (!P.list.length) P.list.push({ id: uid(), name: '新曲目' });
+      P.current = null; await switchProject(P.list[0].id);
+    }
+  };
+};
+
+/* ---------- boot ---------- */
+(async function boot(){
+  if (STANDALONE) {
+    try { await loadPack(JSON.parse(EMB_META), id => EMB_MEDIA[id], false); } catch(e) { toast('檔案內容讀取失敗'); }
+    $('#packStatus').textContent = '這是匯出的離線版本：修改不會自動儲存，需要保留時請再「下載完整檔案」一次。';
+    document.body.classList.add('standalone');
+  } else {
+    await openDB();
+    P = (await idbGet('projects')) || null;
+    if (!P || !P.list || !P.list.length) {
+      const old = await idbGet('meta'); const id = uid();
+      const first = old && old.versions && old.versions[0] ? old.versions[0].name.split(' / ')[0].slice(0, 40) : '';
+      P = { list: [{ id, name: first || '曲目 1' }], current: id };
+      if (old) { await idbSet('meta:' + id, old); await idbDel('meta'); }
+      await idbSet('projects', P);
+    }
+    if (!P.list.find(p => p.id === P.current)) P.current = P.list[0].id;
+    await loadProjectData(metaKey());
+  }
+  renderAll();
+  requestAnimationFrame(tick);
+})();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e) {}
+</script>
+</body>
+</html>

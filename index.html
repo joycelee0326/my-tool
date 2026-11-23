@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joyce 的音樂小工具</title>
+<link rel="icon" href="score-video/icon-192.png">
+<style>
+  :root {
+    --paper: #f5f1e8;
+    --ink: #1d1b19;
+    --muted: #6f675c;
+    --line: #d9d0bf;
+    --accent: #9a3b2a;
+    --card: #fbf8f1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 64px 24px 80px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 36px; }
+  h1 {
+    font-family: "Noto Serif TC", "Songti TC", serif;
+    font-weight: 900;
+    font-size: clamp(30px, 6vw, 44px);
+    letter-spacing: 0.04em;
+    margin: 0 0 8px;
+  }
+  header p { margin: 0; color: var(--muted); }
+  .tools { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .tool a {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 20px 22px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, transform .15s;
+  }
+  .tool a:hover, .tool a:focus-visible { border-color: var(--accent); transform: translateY(-1px); outline: none; }
+  .mark {
+    width: 56px; height: 56px;
+    display: grid; place-items: center;
+    border-radius: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: "Noto Serif TC", serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .tool h2 { font-size: 18px; margin: 0 0 2px; }
+  .tool p { margin: 0; color: var(--muted); font-size: 14px; }
+  .arrow { color: var(--accent); font-size: 20px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 480px) {
+    .tool a { grid-template-columns: 44px 1fr; }
+    .mark { width: 44px; height: 44px; font-size: 20px; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>音樂小工具</h1>
+    <p>Joyce 做的練習與準備工具，全部免安裝，用瀏覽器打開就能用。</p>
+  </header>
+
+  <!-- 新增工具：複製一個 <li class="tool">…</li>，改連結、字、標題和說明即可 -->
+  <ul class="tools">
+    <li class="tool">
+      <a href="exam-prep/">
+        <span class="mark">考</span>
+        <span>
+          <h2>臺藝國樂所筆試準備</h2>
+          <p>考古題、出題趨勢、講義整理、題庫與申論練習、90 分鐘模擬考</p>
+        </span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+    <li class="tool">
+      <a href="score-video/">
+        <span class="mark">譜</span>
+        <span>
+          <h2>樂譜 × 演奏影片對照</h2>
+          <p>把 PDF 樂譜和演奏影片／音檔對齊，看譜跟著聽，每首曲子各自保存標記</p>
+        </span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <footer>筆記、標記等資料只存在你自己的瀏覽器裡。</footer>
+</main>
+</body>
+</html>
