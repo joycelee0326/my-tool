@@ -8,6 +8,7 @@
 |---|---|---|
 | `exam-prep/` | 臺藝國樂所筆試準備 | https://joycelee0326.github.io/my-tool/exam-prep/ |
 | `score-video/` | 樂譜 × 演奏影片對照 | https://joycelee0326.github.io/my-tool/score-video/ |
+| `sight-reading/` | 揚琴視奏練習產生器 | https://joycelee0326.github.io/my-tool/sight-reading/ |
 
 ## 新增一個工具
 
