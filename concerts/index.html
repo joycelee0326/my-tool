@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>音樂會搶票資訊欄</title>
+<link rel="icon" href="../score-video/icon-192.png">
+<style>
+  :root {
+    --paper: #f5f1e8;
+    --ink: #1d1b19;
+    --muted: #6f675c;
+    --line: #d9d0bf;
+    --accent: #9a3b2a;
+    --card: #fbf8f1;
+    --classical: #3d5a80;
+    --guoyue: #8a5a1f;
+    --jazz: #6b3f7a;
+    --pop: #2f7d5b;
+    --other: #6f675c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  a { color: inherit; }
+  main { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+  .back { color: var(--muted); font-size: 14px; text-decoration: none; }
+  .back:hover { color: var(--accent); }
+  header { border-bottom: 1px solid var(--line); padding: 14px 0 22px; margin-bottom: 24px; }
+  h1 {
+    font-family: "Noto Serif TC", "Songti TC", serif;
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 40px);
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+  }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .sources { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .sources .bad { color: var(--accent); }
+
+  h2.section {
+    font-family: "Noto Serif TC", serif;
+    font-size: 20px;
+    margin: 32px 0 12px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  h2.section small { font-family: inherit; font-size: 13px; color: var(--muted); font-weight: 400; }
+
+  /* 即將開賣 */
+  .onsale { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .sale {
+    background: var(--ink); color: var(--paper);
+    border-radius: 10px; padding: 14px 16px;
+    display: grid; gap: 6px; align-content: start;
+  }
+  .sale .when { font-size: 13px; opacity: .75; }
+  .sale .count { font-family: "Noto Serif TC", serif; font-size: 22px; font-weight: 700; color: #f0b9a8; font-variant-numeric: tabular-nums; }
+  .sale a.t { font-weight: 700; text-decoration: none; line-height: 1.4; }
+  .sale a.t:hover { text-decoration: underline; }
+  .sale .meta { font-size: 13px; opacity: .75; }
+  .sale button { justify-self: start; }
+  .empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+
+  /* 篩選 */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
+  .tab {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    padding: 7px 14px; border-radius: 999px; font: inherit; font-size: 15px; cursor: pointer;
+  }
+  .tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tab .n { font-size: 12px; opacity: .65; margin-left: 4px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .filters input[type=search], .filters select {
+    font: inherit; font-size: 15px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink);
+  }
+  .filters input[type=search] { flex: 1 1 220px; min-width: 0; }
+  .filters label { font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .result-count { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  /* 列表 */
+  .month { font-family: "Noto Serif TC", serif; font-size: 17px; margin: 26px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .ev {
+    display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  }
+  .date { text-align: center; border-right: 1px solid var(--line); padding-right: 12px; }
+  .date .d { font-family: "Noto Serif TC", serif; font-size: 26px; font-weight: 700; line-height: 1.1; }
+  .date .w { font-size: 12px; color: var(--muted); }
+  .date .tm { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .ev h3 { font-size: 16px; margin: 0 0 4px; line-height: 1.4; }
+  .ev h3 a { text-decoration: none; }
+  .ev h3 a:hover { color: var(--accent); text-decoration: underline; }
+  .ev .info { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag { font-size: 12px; padding: 1px 8px; border-radius: 4px; border: 1px solid currentColor; }
+  .g-古典 { color: var(--classical); } .g-國樂 { color: var(--guoyue); } .g-爵士 { color: var(--jazz); }
+  .g-流行 { color: var(--pop); } .g-其他 { color: var(--other); }
+  .tag.src { color: var(--muted); border-color: var(--line); }
+  .tag.niuer { color: var(--accent); }
+  .tag.sale-soon { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .actions { display: grid; gap: 6px; justify-items: end; }
+  .star {
+    border: none; background: none; font-size: 22px; cursor: pointer; color: var(--line); padding: 0; line-height: 1;
+  }
+  .star[aria-pressed="true"] { color: #d39a1d; }
+  .btn {
+    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--line); background: transparent; color: inherit; white-space: nowrap;
+  }
+  .sale .btn { border-color: rgba(245,241,232,.4); }
+  .btn:hover { border-color: var(--accent); }
+  .more { display: block; margin: 20px auto 0; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 560px) {
+    .ev { grid-template-columns: 52px 1fr; }
+    .actions { grid-column: 1 / -1; grid-auto-flow: column; justify-content: end; align-items: center; }
+    .date .d { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../">← 音樂小工具</a>
+  <header>
+    <h1>音樂會搶票資訊欄</h1>
+    <p>OPENTIX、KKTIX 與 Blue Note Taipei 的演出，每天自動更新。牛耳藝術的節目會標示「牛耳」。</p>
+    <div class="sources" id="sources">載入中…</div>
+  </header>
+
+  <h2 class="section">即將開賣 <small>可下載開賣提醒，提前 10 分鐘通知</small></h2>
+  <div class="onsale" id="onsale"></div>
+
+  <h2 class="section">演出列表</h2>
+  <div class="tabs" id="tabs" role="group" aria-label="樂種"></div>
+  <div class="filters">
+    <input type="search" id="q" placeholder="搜尋演出、演出者、場館…" aria-label="搜尋">
+    <select id="src" aria-label="來源">
+      <option value="">全部來源</option>
+      <option value="OPENTIX">OPENTIX</option>
+      <option value="KKTIX">KKTIX</option>
+      <option value="Blue Note Taipei">Blue Note Taipei</option>
+      <option value="niuer">牛耳藝術</option>
+    </select>
+    <select id="city" aria-label="城市"><option value="">全部地區</option></select>
+    <label><input type="checkbox" id="starred"> 只看收藏</label>
+  </div>
+  <p class="result-count" id="count"></p>
+  <div id="list"></div>
+  <button class="btn more" id="more" hidden>顯示更多</button>
+
+  <footer>資料取自各售票網站的公開頁面，實際場次、票價與開賣時間以售票網站為準。樂種是依標題關鍵字自動判斷，可能有誤。收藏只存在你自己的瀏覽器裡。</footer>
+</main>
+
+<script>
+const GENRES = ["古典", "國樂", "爵士", "流行", "其他"];
+const PAGE = 80;
+const STAR_KEY = "concerts-starred";
+const fmt = (opts) => new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", ...opts });
+const fDay = fmt({ day: "numeric" }), fWeek = fmt({ weekday: "short" }), fMonth = fmt({ year: "numeric", month: "long" });
+const fTime = fmt({ hour: "2-digit", minute: "2-digit", hour12: false });
+const fFull = fmt({ month: "numeric", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+
+let data = { events: [] }, genre = "全部", shown = PAGE;
+let starred = new Set(JSON.parse(localStorage.getItem(STAR_KEY) || "[]"));
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function countdown(ms) {
+  if (ms <= 0) return "已開賣";
+  const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60;
+  return d ? `${d} 天 ${h} 小時` : h ? `${h} 小時 ${m} 分` : `${m} 分鐘`;
+}
+
+/* ---------- 行事曆 (.ics) ---------- */
+function icsDate(d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); }
+function icsText(s) { return String(s || "").replace(/[\\,;]/g, (c) => "\\" + c).replace(/\n/g, "\\n"); }
+function downloadIcs(ev, kind) {
+  const sale = kind === "sale";
+  const start = new Date(sale ? ev.onSale : ev.start);
+  const end = sale ? new Date(start.getTime() + 30 * 6e4) : new Date(ev.end && !ev.dateOnly ? ev.end : start.getTime() + 2 * 36e5);
+  const lines = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//my-tool//concerts//ZH", "BEGIN:VEVENT",
+    `UID:${icsText(ev.id + (sale ? "-sale" : ""))}@my-tool`, `DTSTAMP:${icsDate(new Date())}`,
+    `DTSTART:${icsDate(start)}`, `DTEND:${icsDate(end)}`,
+    `SUMMARY:${icsText((sale ? "【開賣】" : "") + ev.title)}`,
+    `LOCATION:${icsText(ev.venue)}`, `URL:${ev.url}`,
+    `DESCRIPTION:${icsText((sale ? "購票：" : "") + ev.url)}`,
+    "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsText(ev.title)}`,
+    `TRIGGER:-PT${sale ? 10 : 120}M`, "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ];
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/calendar" }));
+  a.download = (sale ? "開賣-" : "") + ev.title.replace(/[\\/:*?"<>|]/g, "").slice(0, 40) + ".ics";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------- 繪製 ---------- */
+function filtered(ignoreGenre) {
+  const q = $("q").value.trim().toLowerCase(), src = $("src").value, city = $("city").value, onlyStar = $("starred").checked;
+  return data.events.filter((ev) =>
+    (ignoreGenre || genre === "全部" || ev.genre === genre) &&
+    (!src || (src === "niuer" ? ev.niuer : ev.source === src)) &&
+    (!city || ev.city === city) &&
+    (!onlyStar || starred.has(ev.id)) &&
+    (!q || [ev.title, ev.venue, ev.organizer, ev.desc].join(" ").toLowerCase().includes(q)));
+}
+
+function renderTabs() {
+  const base = filtered(true);
+  const n = (g) => g === "全部" ? base.length : base.filter((e) => e.genre === g).length;
+  $("tabs").innerHTML = ["全部", ...GENRES].map((g) =>
+    `<button class="tab" aria-pressed="${g === genre}" data-g="${g}">${g}<span class="n">${n(g)}</span></button>`).join("");
+}
+
+function saleTag(ev, now) {
+  if (!ev.onSale) return "";
+  const t = new Date(ev.onSale).getTime();
+  if (t <= now) return "";
+  const soon = t - now < 7 * 864e5;
+  return `<span class="tag ${soon ? "sale-soon" : "src"}">${fFull.format(t)} 開賣</span>`;
+}
+
+function renderList() {
+  const now = Date.now();
+  const evs = filtered(false);
+  $("count").textContent = `共 ${evs.length} 場`;
+  let html = "", month = "";
+  for (const ev of evs.slice(0, shown)) {
+    const d = ev.start ? new Date(ev.start) : null;
+    const m = d ? fMonth.format(d) : "日期未定";
+    if (m !== month) { if (month) html += "</ul>"; html += `<h3 class="month">${m}</h3><ul class="list">`; month = m; }
+    const ongoing = d && d.getTime() < now;
+    html += `<li class="ev">
+      <div class="date">${d ? `<div class="d">${fDay.format(d).replace("日", "")}</div><div class="w">${fWeek.format(d)}</div>
+        <div class="tm">${ev.dateOnly ? "" : fTime.format(d)}</div>` : "—"}</div>
+      <div>
+        <h3><a href="${esc(ev.url)}" target="_blank" rel="noopener">${esc(ev.title)}</a></h3>
+        <div class="info">
+          ${ev.venue ? `<span>${esc(ev.venue)}</span>` : ""}
+          ${ev.organizer && ev.organizer !== ev.source ? `<span>主辦：${esc(ev.organizer)}</span>` : ""}
+          ${ev.price ? `<span>NT$ ${esc(ev.price)}</span>` : ""}
+          ${ongoing && ev.end ? `<span>演出至 ${fFull.format(new Date(ev.end))}</span>` : ""}
+        </div>
+        <div class="tags">
+          <span class="tag g-${esc(ev.genre)}">${esc(ev.genre)}</span>
+          <span class="tag src">${esc(ev.source)}</span>
+          ${ev.niuer ? `<span class="tag niuer">牛耳</span>` : ""}
+          ${saleTag(ev, now)}
+        </div>
+      </div>
+      <div class="actions">
+        <button class="star" data-star="${esc(ev.id)}" aria-pressed="${starred.has(ev.id)}" aria-label="收藏" title="收藏">★</button>
+        ${ev.start ? `<button class="btn" data-ics="${esc(ev.id)}">加入行事曆</button>` : ""}
+      </div>
+    </li>`;
+  }
+  if (month) html += "</ul>";
+  $("list").innerHTML = html || `<p class="empty">沒有符合條件的演出。</p>`;
+  $("more").hidden = evs.length <= shown;
+}
+
+function renderOnSale() {
+  const now = Date.now();
+  const soon = data.events
+    .filter((e) => e.onSale && new Date(e.onSale).getTime() > now)
+    .filter((e) => genre === "全部" || e.genre === genre)
+    .sort((a, b) => a.onSale.localeCompare(b.onSale))
+    .slice(0, 12);
+  $("onsale").innerHTML = soon.length ? soon.map((ev) => `<div class="sale">
+      <div class="count" data-sale="${esc(ev.onSale)}">${countdown(new Date(ev.onSale) - now)}</div>
+      <div class="when">${fFull.format(new Date(ev.onSale))} 開賣 · ${esc(ev.genre)}</div>
+      <a class="t" href="${esc(ev.url)}" target="_blank" rel="noopener">${esc(ev.title)}</a>
+      <div class="meta">${ev.start ? fFull.format(new Date(ev.start)) : ""} ${esc(ev.venue || "")}</div>
+      <button class="btn" data-ics-sale="${esc(ev.id)}">下載開賣提醒</button>
+    </div>`).join("")
+    : `<p class="empty">目前${genre === "全部" ? "" : genre}沒有已公布、尚未開賣的場次（KKTIX 和 Blue Note 不提供開賣時間）。</p>`;
+}
+
+function renderSources() {
+  const s = data.sources || {};
+  const when = data.generated ? fFull.format(new Date(data.generated)) : "—";
+  $("sources").innerHTML = `<span>最後更新：${when}</span>` + Object.entries(s).map(([k, v]) =>
+    `<span class="${v.ok ? "" : "bad"}">${esc(k)} ${v.count} 場${v.ok ? "" : "（這次抓取失敗，顯示上次資料）"}</span>`).join("");
+}
+
+function render() { renderTabs(); renderOnSale(); renderList(); }
+
+/* ---------- 事件 ---------- */
+$("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-g]"); if (!b) return;
+  genre = b.dataset.g; shown = PAGE; render();
+});
+for (const id of ["q", "src", "city", "starred"]) $(id).addEventListener("input", () => { shown = PAGE; renderTabs(); renderList(); });
+$("more").addEventListener("click", () => { shown += PAGE; renderList(); });
+document.addEventListener("click", (e) => {
+  const star = e.target.closest("[data-star]");
+  if (star) {
+    const id = star.dataset.star;
+    starred.has(id) ? starred.delete(id) : starred.add(id);
+    localStorage.setItem(STAR_KEY, JSON.stringify([...starred]));
+    star.setAttribute("aria-pressed", starred.has(id));
+    return;
+  }
+  const b = e.target.closest("[data-ics],[data-ics-sale]");
+  if (b) {
+    const id = b.dataset.ics || b.dataset.icsSale;
+    const ev = data.events.find((x) => x.id === id);
+    if (ev) downloadIcs(ev, b.dataset.icsSale ? "sale" : "show");
+  }
+});
+setInterval(() => {
+  const now = Date.now();
+  document.querySelectorAll("[data-sale]").forEach((el) => { el.textContent = countdown(new Date(el.dataset.sale) - now); });
+}, 30000);
+
+fetch("data.json", { cache: "no-cache" })
+  .then((r) => r.json())
+  .then((d) => {
+    data = d;
+    const cities = [...new Set(d.events.map((e) => e.city).filter(Boolean))].sort();
+    $("city").insertAdjacentHTML("beforeend", cities.map((c) => `<option>${esc(c)}</option>`).join(""));
+    renderSources(); render();
+  })
+  .catch(() => { $("sources").textContent = "資料載入失敗，請稍後再試。"; });
+</script>
+</body>
+</html>
