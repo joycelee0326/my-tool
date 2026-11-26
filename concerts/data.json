@@ -1,54 +1,23 @@
 {
- "generated": "2026-11-26T21:28+08:00",
+ "generated": "2026-11-27T03:53+08:00",
  "sources": {
   "OPENTIX": {
    "ok": true,
-   "count": 433,
-   "updated": "2026-11-26T21:28+08:00"
+   "count": 430,
+   "updated": "2026-11-27T03:53+08:00"
   },
   "KKTIX": {
    "ok": true,
    "count": 0,
-   "updated": "2026-11-26T21:28+08:00"
+   "updated": "2026-11-27T03:53+08:00"
   },
   "Blue Note Taipei": {
    "ok": true,
    "count": 18,
-   "updated": "2026-11-26T21:28+08:00"
+   "updated": "2026-11-27T03:53+08:00"
   }
  },
  "events": [
-  {
-   "id": "2099853062099406849",
-   "title": "【節目取消】致敬蕭斯塔科維奇",
-   "url": "https://www.opentix.life/event/2099853062099406849",
-   "image": "https://s3.resource.opentix.life/upload/program/1791247949554cZ0p4WYTtO.jpeg",
-   "organizer": "新竹市立交響樂團",
-   "venue": "國家兩廳院演奏廳",
-   "desc": "地點:國家兩廳院演奏廳,主辦單位:新竹市立交響樂團,新竹市立交響樂團長期深耕新竹，除致力於交響樂演出，也持續透過室內樂、音樂教育及多元形式的節目，將經典作品帶入更多人的日常。隨著新竹人口成長、城市文化需求日益提升，樂團期待從風城出發，逐步拓展演出的地域與面貌，讓更多觀眾感受古典音樂真切而動人的力量。2026年，新竹市立交響樂團首度走進臺北國家兩廳院演奏廳，推出室內樂音樂會《致敬蕭斯塔科維契》。本場邀請國立清華",
-   "start": "2026-11-26T19:30+08:00",
-   "end": "2026-11-26T21:30+08:00",
-   "onSale": "2026-10-02T12:00+08:00",
-   "price": "800",
-   "city": "臺北市",
-   "source": "OPENTIX",
-   "genre": "古典",
-   "niuer": false
-  },
-  {
-   "id": "bluenote-tai-bei-lan-diao-zhou-si-te-yan-li-cheng-yu-si-zhong-zou-1126",
-   "source": "Blue Note Taipei",
-   "title": "台北藍調 週四特演 李承育四重奏 | Chengyu Lee Quartet 1126",
-   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-si-te-yan-li-cheng-yu-si-zhong-zou",
-   "start": "2026-11-26T21:00+08:00",
-   "end": "2026-11-26T23:00+08:00",
-   "venue": "Blue Note Taipei 台北藍調",
-   "city": "臺北市",
-   "organizer": "Blue Note Taipei",
-   "desc": "由爵士薩克斯風演奏家┉李承育領銜,邀請各方爵士新秀共襄盛舉⋆⟢꙳ 鋼琴張鈺宸𓂃貝斯李明祐𓂃鼓組廖均賀,將帶來一整晚爵士經典、融合、拉丁等曲目, 一同品味輕鬆愜意的爵士夜晚,精彩可期、千萬別錯過 .ᐟ",
-   "genre": "爵士",
-   "niuer": false
-  },
   {
    "id": "2107728569117466625",
    "title": "與世界連結——夢想啟程，跨越世代，共鳴未來",
@@ -2648,6 +2617,20 @@
    "city": "高雄市",
    "source": "OPENTIX",
    "genre": "古典",
+   "niuer": false
+  },
+  {
+   "id": "bluenote-tai-bei-lan-diao-zhou-san-te-yan-20-1216",
+   "source": "Blue Note Taipei",
+   "title": "台北藍調 週三特演 The Reunion Trio | 1216",
+   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-san-te-yan-20",
+   "start": "2026-12-16T21:00+08:00",
+   "end": "2026-12-16T23:00+08:00",
+   "venue": "Blue Note Taipei 台北藍調",
+   "city": "臺北市",
+   "organizer": "Blue Note Taipei",
+   "desc": "每月的第三個週三 鋼琴名家翁家怡搭檔 貝斯好手許巽舜 鼓手馬仕函 三位音樂夥伴因爲對音樂的熱情又重聚 共同來詮釋彼此所喜愛的爵士標準經典曲目⊹ ꕤ ̊ ᴇᴠᴇʀʏ 3ʀᴅ ᴡᴇᴅɴᴇꜱᴅᴀʏ, ꜰᴀᴍᴏᴜꜱ ᴘɪᴀɴɪꜱᴛ ɢʀᴀᴄᴇ ᴡᴇɴɢ ᴡɪʟʟ ᴘʟᴀʏ ᴍᴇʟʟᴏᴡ ᴊᴀᴢᴢ ꜰɪɴᴇ ᴛᴏɴᴇꜱ, ꜰᴇᴀᴛᴜʀɪɴɢ ʜꜱᴜ ʜꜱᴜɴ ꜱʜᴜɴ ᴏɴ ʙᴀꜱꜱ, ꜱᴛᴇᴠᴇɴ ᴍᴀ ᴏɴ ᴅʀᴜᴍꜱ.",
+   "genre": "爵士",
    "niuer": false
   },
   {
@@ -7595,38 +7578,6 @@
    "source": "OPENTIX",
    "genre": "古典",
    "niuer": false
-  },
-  {
-   "id": "2103461573718614017",
-   "title": "北藝大2026秋冬系列《北藝大擊樂團2026秋冬音樂會》",
-   "url": "https://www.opentix.life/event/2103461573718614017",
-   "image": "https://s3.resource.opentix.life/upload/program/1790082778098dRQG8LN3IG.png",
-   "organizer": "國立臺北藝術大學 音樂學系",
-   "venue": "",
-   "desc": "國立臺北藝術大學,北藝大擊樂團2026秋冬音樂會TNUA Percussion Ensemble Fall- Winter Concert 2026 演出時間：2026年11月26日(四)19:30演出地點：國立臺北藝術大學音樂廳北藝大擊樂團 擊樂，是最直接貼近身體的聲音。鼓的震動、鑼的迴響、琴鍵的敲擊，在瞬間與空間交會，也在傳統與當代之間，開",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "流行",
-   "niuer": false,
-   "city": ""
-  },
-  {
-   "id": "2082728853642915841",
-   "title": "《聲界漫遊》- 從聖詠到當代",
-   "url": "https://www.opentix.life/event/2082728853642915841",
-   "image": "https://s3.resource.opentix.life/upload/program/1786085770618ZZXAHfGUbK.jpeg",
-   "organizer": "大地音樂精靈樂團",
-   "venue": "",
-   "desc": "跨越時代的〈Ave Maria〉聲音光譜 從 Caccini、Mascagni、Saint-Saëns 到 Gounod × Bach × 爵士改編，音樂會上半場集結八首風格各異的〈Ave Maria〉，由女高音謝淑文、連筱筠、次女高音 Deidra Palmour，攜手光禾歌手合唱團、高師大合唱團及高師大管弦樂團共同演出。透過獨唱、合唱與管弦樂等",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "爵士",
-   "niuer": false,
-   "city": ""
   }
  ]
 }
