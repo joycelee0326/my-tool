@@ -1,20 +1,20 @@
 {
- "generated": "2026-11-27T21:25+08:00",
+ "generated": "2026-11-28T03:42+08:00",
  "sources": {
   "OPENTIX": {
    "ok": true,
-   "count": 430,
-   "updated": "2026-11-27T21:25+08:00"
+   "count": 427,
+   "updated": "2026-11-28T03:42+08:00"
   },
   "KKTIX": {
    "ok": true,
    "count": 0,
-   "updated": "2026-11-27T21:25+08:00"
+   "updated": "2026-11-28T03:42+08:00"
   },
   "Blue Note Taipei": {
    "ok": true,
    "count": 18,
-   "updated": "2026-11-27T21:25+08:00"
+   "updated": "2026-11-28T03:42+08:00"
   }
  },
  "events": [
@@ -7527,54 +7527,6 @@
    "source": "OPENTIX",
    "genre": "古典",
    "niuer": false
-  },
-  {
-   "id": "2103463801074393089",
-   "title": "北藝大2026秋冬系列《2026關渡新聲協奏曲音樂會》",
-   "url": "https://www.opentix.life/event/2103463801074393089",
-   "image": "https://s3.resource.opentix.life/upload/program/1790082778098dRQG8LN3IG.png",
-   "organizer": "國立臺北藝術大學 音樂學系",
-   "venue": "",
-   "desc": "國立臺北藝術大學,2026關渡新聲協奏曲音樂會Emerging Young Artists: TNUA Concerto Concert 2026演出時間：2026年11月27日(五)19:30演出地點：國立臺北藝術大學音樂廳指揮/張佳韻、施秉均、薩克斯風/徐振凱、低音號/紀凱欣、馬林巴木琴/陳映彤、小提琴/許裕立、北藝大管絃樂團2026關渡新聲協奏曲音樂會，集結北藝大青年演",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "古典",
-   "niuer": false,
-   "city": ""
-  },
-  {
-   "id": "2098255075466424321",
-   "title": "聲琴樂語VII",
-   "url": "https://www.opentix.life/event/2098255075466424321",
-   "image": "https://s3.resource.opentix.life/upload/program/1789099683676MYHZvzKKK7.png",
-   "organizer": "雲彩室內樂團",
-   "venue": "",
-   "desc": "聲琴樂語VII是由女高音演唱家戴旖旎、小提琴家陳沁紅、單簧管家楊蕙祺、大提琴家曾史妃與鋼琴家林欣潔自2019年首次合作演出大受好評後，今年第七度帶來多首不同室內樂形式演出，豐富而精采的樂曲將帶給聽眾一個歡愉的夜晚。",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "古典",
-   "niuer": false,
-   "city": ""
-  },
-  {
-   "id": "2031641590503866369",
-   "title": "郭靖沐箏獨奏會《念》",
-   "url": "https://www.opentix.life/event/2031641590503866369",
-   "image": "https://s3.resource.opentix.life/upload/program/1791360483867TtzFpPiSFR.png",
-   "organizer": "三個人",
-   "venue": "",
-   "desc": "※本創作計畫獲第24屆台新藝術獎入圍贊助※ 【節目簡介】郭靖沐的箏樂獨具一格，兼具傳統底蘊與當代展演意象。繼以七聲絃制箏探討天地萬象後，本次獨奏會以《念》為題，將目光聚焦於自然的微觀與巨觀——從火、水、風的動態聲響，到昆蟲與萬物的生命律動。透過極具專注力的凝視與探索，將萬物意象化為絃音，開創當代箏樂的多元想像。【演出曲目】郭靖沐：《塵》古箏獨奏 郭",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "古典",
-   "niuer": false,
-   "city": ""
   }
  ]
 }
