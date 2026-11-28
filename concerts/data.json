@@ -1,54 +1,23 @@
 {
- "generated": "2026-11-28T20:38+08:00",
+ "generated": "2026-11-29T02:33+08:00",
  "sources": {
   "OPENTIX": {
    "ok": true,
-   "count": 422,
-   "updated": "2026-11-28T20:38+08:00"
+   "count": 420,
+   "updated": "2026-11-29T02:33+08:00"
   },
   "KKTIX": {
    "ok": true,
    "count": 0,
-   "updated": "2026-11-28T20:38+08:00"
+   "updated": "2026-11-29T02:33+08:00"
   },
   "Blue Note Taipei": {
    "ok": true,
    "count": 18,
-   "updated": "2026-11-28T20:38+08:00"
+   "updated": "2026-11-29T02:33+08:00"
   }
  },
  "events": [
-  {
-   "id": "2089265976854073345",
-   "title": "Dawn of Strings張惜晨小提琴獨奏會",
-   "url": "https://www.opentix.life/event/2089265976854073345",
-   "image": "https://s3.resource.opentix.life/upload/program/1786954363699RUVqf8wODN.jpeg",
-   "organizer": "櫟聲音樂劇場",
-   "venue": "臺中國家歌劇院小劇場",
-   "desc": "地點:臺中國家歌劇院小劇場,主辦單位:櫟聲音樂劇場,「珍惜每一次演奏的時光，傾訴屬於青春的音樂章節。」張惜晨，現年16歲的臺灣青少年小提琴家。 此次音樂會以Dawn of Strings為主題，象徵著年輕音樂家如旭日初升的音樂旅程，惜晨將帶來莫札特、貝多芬、德弗札克的經典作品，帶您一覽德、奧、捷美妙的音樂風光。 【溫暖傳愛】本場音樂會所有售票所得（不扣除成本），將全數捐贈予台中惠明盲校，用音樂點亮盲",
-   "start": "2026-11-28T19:30+08:00",
-   "end": "2026-11-28T21:00+08:00",
-   "onSale": "2026-08-28T12:00+08:00",
-   "price": "500",
-   "city": "臺中市",
-   "source": "OPENTIX",
-   "genre": "古典",
-   "niuer": false
-  },
-  {
-   "id": "bluenote-tai-bei-lan-diao-zhou-liu-te-yan-wu-ye-xun-si-zhong-zou-2026-11-28-21-30-1128",
-   "source": "Blue Note Taipei",
-   "title": "台北藍調 週六特演 烏野薰四重奏 KUQ | Every Saturday",
-   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-liu-te-yan-wu-ye-xun-si-zhong-zou-2026-11-28-21-30",
-   "start": "2026-11-28T21:30+08:00",
-   "end": "2026-11-28T23:30+08:00",
-   "venue": "Blue Note Taipei 台北藍調",
-   "city": "臺北市",
-   "organizer": "Blue Note Taipei",
-   "desc": "每個週六夜晚.ᐟ Kaoru Uno Quartet 烏野薰四重奏 由演奏/教學資歷豐富的鋼琴名家烏野薰老師領銜 搭檔樂壇摯友重奏組 跳脫音符的酷派爵士 意外體貼 繞樑入魂 Staying in Taiwan for decades, famous Japanese pianist Kaoru Uno is committed to promoting and sharing the passion for jazz with music lovers all around ",
-   "genre": "爵士",
-   "niuer": false
-  },
   {
    "id": "2120044825778409472",
    "title": "樂舞共鳴：世界名曲饗宴",
@@ -752,7 +721,7 @@
    "id": "2112823512247214081",
    "title": "聲聲不息—台大校友管樂團第二十九季音樂會",
    "url": "https://www.opentix.life/event/2112823512247214081",
-   "image": "https://s3.resource.opentix.life/upload/program/1685444604237J0IYtKHEku.jpeg",
+   "image": "https://s3.resource.opentix.life/upload/program/179588493852051UdQEQq2z.png",
    "organizer": "台大校友管樂團",
    "venue": "東吳大學松怡廳",
    "desc": "地點:東吳大學松怡廳,主辦單位:台大校友管樂團,【台大校友管樂團介紹】國立臺灣大學管樂團創團至今已超過七十寒暑，而眾多曾在台大管樂團揮灑過大學青春歲月的團友，在畢業之後仍對當年合奏的感動難以忘懷，於是在譚萬康學長、李文豪學長等人推動下，「台大校友樂團」於民國九十八年立案；在台大校友樂團學長們的支持，以及陳宇文學姐、吳志桓學長等幹部多方奔走下，「台大校友管樂團」於民國一百年五月一日正式成立，並於同年的八月十",
@@ -2546,6 +2515,20 @@
    "city": "苗栗縣",
    "source": "OPENTIX",
    "genre": "古典",
+   "niuer": false
+  },
+  {
+   "id": "bluenote-tai-bei-lan-diao-zhou-wu-te-yan-bian-xing-chong-jue-shi-le-tuan-2026-12-18-21-30-1218",
+   "source": "Blue Note Taipei",
+   "title": "台北藍調 週五特演 變形蟲爵士樂團 JMB | Every Friday",
+   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-wu-te-yan-bian-xing-chong-jue-shi-le-tuan-2026-12-18-21-30",
+   "start": "2026-12-18T21:30+08:00",
+   "end": "2026-12-18T23:30+08:00",
+   "venue": "Blue Note Taipei 台北藍調",
+   "city": "臺北市",
+   "organizer": "Blue Note Taipei",
+   "desc": "變形蟲爵士樂團 Jazz Meta Band 成立多年 致力於爵士樂教育推廣的正典樂團 參與多次的國際性音樂節演出 成熟演繹各式風格的經典曲目 Over 2 decades playing together, been invited to perform at major local/international jazz festivals over years, the Jazz Meta Band has reached the level of maturity, i",
+   "genre": "爵士",
    "niuer": false
   },
   {
@@ -7425,22 +7408,6 @@
    "source": "OPENTIX",
    "genre": "古典",
    "niuer": false
-  },
-  {
-   "id": "2084197567053049856",
-   "title": "拾光－2026天狼星口琴樂團音樂會",
-   "url": "https://www.opentix.life/event/2084197567053049856",
-   "image": "https://s3.resource.opentix.life/upload/program/1785823458795Tdz8qCq0gx.jpeg",
-   "organizer": "天狼星口琴樂團",
-   "venue": "",
-   "desc": "拾起流光，讓音樂照亮記憶與新的旅程Gathering light, music shines on memories and the journey ahead口琴小巧，卻蘊藏無限可能，能穿梭於古典、流行、爵士與現代音樂之間。天狼星口琴樂團為2017世界口琴大賽小合奏冠軍得主，長年致力於口琴重奏音樂的革新與推廣，也在與各國音樂家的交流中，汲取多元而動人的音樂",
-   "start": null,
-   "end": null,
-   "onSale": null,
-   "source": "OPENTIX",
-   "genre": "流行",
-   "niuer": false,
-   "city": ""
   }
  ]
 }
