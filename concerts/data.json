@@ -1,37 +1,23 @@
 {
- "generated": "2026-11-28T03:42+08:00",
+ "generated": "2026-11-28T12:38+08:00",
  "sources": {
   "OPENTIX": {
    "ok": true,
    "count": 427,
-   "updated": "2026-11-28T03:42+08:00"
+   "updated": "2026-11-28T12:38+08:00"
   },
   "KKTIX": {
    "ok": true,
    "count": 0,
-   "updated": "2026-11-28T03:42+08:00"
+   "updated": "2026-11-28T12:38+08:00"
   },
   "Blue Note Taipei": {
    "ok": true,
    "count": 18,
-   "updated": "2026-11-28T03:42+08:00"
+   "updated": "2026-11-28T12:38+08:00"
   }
  },
  "events": [
-  {
-   "id": "bluenote-tai-bei-lan-diao-zhou-wu-te-yan-bian-xing-chong-jue-shi-le-tuan-2026-11-27-21-30-1127",
-   "source": "Blue Note Taipei",
-   "title": "台北藍調 週五特演 變形蟲爵士樂團 JMB | Every Friday",
-   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-wu-te-yan-bian-xing-chong-jue-shi-le-tuan-2026-11-27-21-30",
-   "start": "2026-11-27T21:30+08:00",
-   "end": "2026-11-27T23:30+08:00",
-   "venue": "Blue Note Taipei 台北藍調",
-   "city": "臺北市",
-   "organizer": "Blue Note Taipei",
-   "desc": "變形蟲爵士樂團 Jazz Meta Band 成立多年 致力於爵士樂教育推廣的正典樂團 參與多次的國際性音樂節演出 成熟演繹各式風格的經典曲目 Over 2 decades playing together, been invited to perform at major local/international jazz festivals over years, the Jazz Meta Band has reached the level of maturity, i",
-   "genre": "爵士",
-   "niuer": false
-  },
   {
    "id": "2110899582547410944",
    "title": "Glisten Arts 2026 青春萬花筒",
@@ -2546,6 +2532,20 @@
    "city": "臺北市",
    "source": "OPENTIX",
    "genre": "古典",
+   "niuer": false
+  },
+  {
+   "id": "bluenote-tai-bei-lan-diao-zhou-si-te-yan-ye-zu-an-san-zhong-zou-10-1217",
+   "source": "Blue Note Taipei",
+   "title": "台北藍調 週四特演 葉祖安三重奏 Andrew Page Trio | 1217",
+   "url": "https://www.bluenotetaipei.com/event-details/tai-bei-lan-diao-zhou-si-te-yan-ye-zu-an-san-zhong-zou-10",
+   "start": "2026-12-17T21:00+08:00",
+   "end": "2026-12-17T23:00+08:00",
+   "venue": "Blue Note Taipei 台北藍調",
+   "city": "臺北市",
+   "organizer": "Blue Note Taipei",
+   "desc": "葉祖安 ( Andrew Page, USA ) 是曾獲金曲獎提名的音樂家。 與鼓手Chuck Payne和貝斯手朴秀鐘攜手合作,共度璀璨雋永的經典爵士鋼琴夜.ᐟ ᴘɪᴀɴɪꜱᴛ ᴀɴᴅʀᴇᴡ ᴘᴀɢᴇ, ᴡɪᴛʜ ᴅʀᴜᴍᴍᴇʀ ᴄʜᴜᴄᴋ ᴘᴀʏɴᴇ, ᴛᴇᴀᴍꜱ ᴜᴘ ᴡɪᴛʜ ʙᴀꜱꜱɪꜱᴛ ꜱᴜᴊᴏɴɢ ᴘᴀʀᴋ ꜰᴏʀ ᴀ ɴɪɢʜᴛ ᴏꜰ ᴄʟᴀꜱꜱɪᴄ ᴊᴀᴢᴢ ᴘɪᴀɴᴏ ꜱᴛᴀɴᴅᴀʀᴅꜱ. [ 葉祖安 Andrew Page | Piano ] [ 朴秀",
+   "genre": "爵士",
    "niuer": false
   },
   {
